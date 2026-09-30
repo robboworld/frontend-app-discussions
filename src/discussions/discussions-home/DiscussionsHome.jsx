@@ -10,6 +10,7 @@ import {
 
 import { LearningHeader as Header } from '@edx/frontend-component-header';
 
+import '../../robbo-chrome/learning-header.css';
 import { Spinner } from '../../components';
 import selectCourseTabs from '../../components/NavigationBar/data/selectors';
 import { ALL_ROUTES, DiscussionProvider, Routes as ROUTES } from '../../data/constants';

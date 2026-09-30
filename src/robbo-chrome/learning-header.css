@@ -1,0 +1,221 @@
+/*
+ * Copyright (C) 2026 Robbo <https://robbo.ru>
+ * SPDX-License-Identifier: AGPL-3.0-only
+ * Part of the Robbo Open edX distribution. See NOTICE at repository root.
+ *
+ * Discussions LearningHeader — same look as Authoring StudioHeader
+ * (frontend-app-authoring/src/robbo-frontend-chrome/studio-header.css).
+ */
+
+@font-face {
+  font-family: "ProximaNova";
+  src: url("./fonts/ProximaNova-Regular.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "ProximaNova";
+  src: url("./fonts/ProximaNova-Extrabold.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "ProximaNova";
+  src: url("./fonts/ProximaNova-Extrabold.woff") format("woff");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+.learning-header,
+.learning-header .container-xl {
+  background: #00af41 !important;
+  background-color: #00af41 !important;
+}
+
+.learning-header {
+  min-height: 75px !important;
+  box-shadow: none !important;
+  border-bottom: none !important;
+  color: #fff !important;
+}
+
+/* Same inner width/padding as LMS `.header-container` / Studio header */
+.learning-header .container-xl {
+  max-width: 1600px !important;
+  min-height: 75px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding: 6px 20px !important;
+  width: 100% !important;
+}
+
+@media (min-width: 992px) {
+  .learning-header .container-xl {
+    padding-left: 28px !important;
+    padding-right: 28px !important;
+  }
+}
+
+/* Wordmark = LMS: ProximaNova 30px + superscript ®; logo <img> hidden. */
+.learning-header a.logo {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: flex-start !important;
+  align-self: center !important;
+  gap: 0.06em;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1.1 !important;
+  text-decoration: none !important;
+  color: #fff !important;
+  font-family: "ProximaNova", "Proxima Nova", Helvetica, Arial, sans-serif !important;
+  font-size: 30px !important;
+  font-weight: 700 !important;
+}
+
+.learning-header a.logo::after {
+  content: "\0420\041E\0411\0411\041E";
+  order: 1;
+  color: #fff !important;
+  font-family: inherit !important;
+  font-size: 1em !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.learning-header a.logo::before {
+  content: "\00AE" !important;
+  display: inline !important;
+  order: 2;
+  color: #fff !important;
+  font-family: inherit !important;
+  font-size: 0.45em !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  margin: 0.15em 0 0 0 !important;
+}
+
+.learning-header a.logo img {
+  order: 0;
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  border: 0 !important;
+  opacity: 0 !important;
+}
+
+.learning-header .course-title-lockup {
+  align-self: center;
+  margin-left: 1.5rem;
+  padding-left: 1.5rem;
+  border-left: 1px solid rgba(255, 255, 255, 0.35) !important;
+}
+
+.learning-header .course-title-lockup,
+.learning-header .course-title-lockup span,
+.learning-header a:not(.dropdown-item),
+.learning-header .text-gray-700 {
+  color: #fff !important;
+}
+
+/* User pill — LMS `.robbo-layout-user-menu__toggle` */
+.learning-header .user-dropdown > .btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  margin: 0 !important;
+  padding: 6px 16px !important;
+  background: transparent !important;
+  color: #fff !important;
+  border: 1px solid #fff !important;
+  border-radius: 999px !important;
+  box-shadow: none !important;
+  font-family: "ProximaNova", "Proxima Nova", Helvetica, Arial, sans-serif !important;
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+  line-height: 1.35 !important;
+  transition: background-color 150ms ease;
+}
+
+.learning-header .user-dropdown > .btn:hover,
+.learning-header .user-dropdown > .btn:focus,
+.learning-header .user-dropdown.show > .btn {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #fff !important;
+  border-color: #fff !important;
+}
+
+/* Chevron on ::after only (same as LMS / Studio). */
+.learning-header .user-dropdown > .btn::after {
+  content: "" !important;
+  display: inline-block !important;
+  flex-shrink: 0 !important;
+  box-sizing: content-box !important;
+  width: 5px !important;
+  height: 5px !important;
+  margin: 0 !important;
+  border-style: solid !important;
+  border-color: #fff !important;
+  border-width: 0 2px 2px 0 !important;
+  vertical-align: middle !important;
+  position: relative !important;
+  top: -2px !important;
+  transform: rotate(45deg) !important;
+  transition: transform 200ms ease, top 200ms ease !important;
+}
+
+.learning-header .user-dropdown > .btn[aria-expanded="true"]::after {
+  top: 0 !important;
+  transform: rotate(225deg) !important;
+}
+
+.learning-header .dropdown-menu {
+  color: #383838;
+}
+
+.learning-header .dropdown-menu a,
+.learning-header .dropdown-menu .dropdown-item {
+  color: #383838 !important;
+  background-color: transparent !important;
+  transition: background-color 150ms ease;
+}
+
+.learning-header .dropdown-menu.show a:hover,
+.learning-header .dropdown-menu.show a:focus-visible,
+.learning-header .dropdown-menu.show .dropdown-item:hover,
+.learning-header .dropdown-menu.show .dropdown-item:focus-visible {
+  background-color: rgba(0, 0, 0, 0.1) !important;
+  color: #1a1a1a !important;
+}
+
+.learning-header .dropdown-menu.show a:active,
+.learning-header .dropdown-menu.show .dropdown-item:active {
+  background-color: rgba(0, 0, 0, 0.16) !important;
+}
+
+@media (max-width: 767.98px) {
+  .learning-header,
+  .learning-header .container-xl {
+    min-height: 55px !important;
+  }
+
+  .learning-header a.logo {
+    font-size: 22px !important;
+  }
+
+  .learning-header .course-title-lockup {
+    margin-left: 0.75rem;
+    padding-left: 0.75rem;
+  }
+}
