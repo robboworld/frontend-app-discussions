@@ -9,8 +9,10 @@ import {
 } from 'react-router-dom';
 
 import { LearningHeader as Header } from '@edx/frontend-component-header';
+import { getAuthenticatedUser } from '@edx/frontend-platform/auth';
 
 import '../../robbo-chrome/learning-header.css';
+import { ROBBO_STACK_PROFILE } from '../../robbo-chrome/stackProfile';
 import { Spinner } from '../../components';
 import selectCourseTabs from '../../components/NavigationBar/data/selectors';
 import { ALL_ROUTES, DiscussionProvider, Routes as ROUTES } from '../../data/constants';
@@ -82,7 +84,16 @@ const DiscussionsHome = () => {
   return (
     <Suspense fallback={(<Spinner />)}>
       <DiscussionContext.Provider value={discussionContextValue}>
-        {!enableInContextSidebar && (<Header courseOrg={org} courseNumber={courseNumber} courseTitle={courseTitle} />)}
+        {!enableInContextSidebar && (
+          // Admin-only stack profile letter (O / S / C) left of the logo — drawn in learning-header.css.
+          <div
+            className={classNames('robbo-stack-shell', `robbo-stack-shell--${ROBBO_STACK_PROFILE}`, {
+              'robbo-stack-shell--admin': getAuthenticatedUser()?.administrator,
+            })}
+          >
+            <Header courseOrg={org} courseNumber={courseNumber} courseTitle={courseTitle} />
+          </div>
+        )}
         <main className="container-fluid d-flex flex-column p-0 w-100 font-size" id="main" tabIndex="-1">
           {!enableInContextSidebar && <CourseTabsNavigation />}
           {(isEnrolled || !isUserLearner) && (
