@@ -12,6 +12,7 @@ import { LearningHeader as Header } from '@edx/frontend-component-header';
 import { getAuthenticatedUser } from '@edx/frontend-platform/auth';
 
 import '../../robbo-chrome/learning-header.css';
+import RobboHeaderExtras from '../../robbo-chrome/HeaderExtras';
 import { ROBBO_STACK_PROFILE } from '../../robbo-chrome/stackProfile';
 import { Spinner } from '../../components';
 import selectCourseTabs from '../../components/NavigationBar/data/selectors';
@@ -57,6 +58,8 @@ const DiscussionsHome = () => {
   const isOnTabletorDesktop = useIsOnTablet();
   let displaySidebar = useSidebarVisible();
   const enableInContextSidebar = Boolean(new URLSearchParams(location.search).get('inContextSidebar') !== null);
+  // Robbo buttons before the user menu of the package header (robbo-chrome/HeaderExtras.jsx).
+  const stackShellRef = useRef(null);
   const {
     courseId, postId, topicId, category, learnerUsername,
   } = params;
@@ -87,11 +90,13 @@ const DiscussionsHome = () => {
         {!enableInContextSidebar && (
           // Admin-only stack profile letter (O / S / C) left of the logo — drawn in learning-header.css.
           <div
+            ref={stackShellRef}
             className={classNames('robbo-stack-shell', `robbo-stack-shell--${ROBBO_STACK_PROFILE}`, {
               'robbo-stack-shell--admin': getAuthenticatedUser()?.administrator,
             })}
           >
             <Header courseOrg={org} courseNumber={courseNumber} courseTitle={courseTitle} />
+            <RobboHeaderExtras shellRef={stackShellRef} />
           </div>
         )}
         <main className="container-fluid d-flex flex-column p-0 w-100 font-size" id="main" tabIndex="-1">

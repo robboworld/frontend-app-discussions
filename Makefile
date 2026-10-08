@@ -63,7 +63,12 @@ pull_translations:
 	           translations/paragon/src/i18n/messages:paragon \
 	           translations/frontend-app-discussions/src/i18n/messages:frontend-app-discussions
 
-	$(intl_imports) frontend-component-header frontend-component-footer frontend-platform paragon frontend-app-discussions
+	# Robbo locale patches (merged last by intl-imports).
+	mkdir -p $(i18n)/messages/robbo-custom
+	cp $(i18n)/robbo-overrides/en.json $(i18n)/messages/robbo-custom/en.json
+	cp $(i18n)/robbo-overrides/ru.json $(i18n)/messages/robbo-custom/ru.json
+
+	$(intl_imports) frontend-component-header frontend-component-footer frontend-platform paragon frontend-app-discussions robbo-custom
 # endif
 
 # This target is used by Travis.
