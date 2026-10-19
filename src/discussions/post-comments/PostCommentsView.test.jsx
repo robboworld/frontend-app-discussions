@@ -796,6 +796,27 @@ describe('ThreadView', () => {
       expect(screen.queryByTestId('tinymce-editor').value).toBe('');
     });
 
+    // Robbo: a failed save used to close the editor and drop the text; now both stay, with what failed and the code.
+    it('keeps the response and shows an error notice when saving fails', async () => {
+      axiosMock.onPost(commentsApiUrl).reply(500);
+      await waitFor(() => renderComponent(discussionPostId));
+
+      await act(async () => {
+        fireEvent.click(screen.queryByText('Add response'));
+      });
+
+      await waitFor(() => {
+        fireEvent.change(screen.queryByTestId('tinymce-editor'), { target: { value: 'Failed response!' } });
+      });
+
+      await act(async () => {
+        fireEvent.click(screen.queryByText('Submit'));
+      });
+
+      await waitFor(() => expect(screen.getByText(/SRV-ERROR/)).toBeInTheDocument());
+      expect(screen.queryByTestId('tinymce-editor').value).toBe('Failed response!');
+    });
+
     it('successfully maintain response for the specific post in the draft.', async () => {
       await waitFor(() => renderComponent(discussionPostId));
 

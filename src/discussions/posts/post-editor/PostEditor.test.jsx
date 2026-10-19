@@ -292,6 +292,28 @@ describe('PostEditor', () => {
       });
       expect(screen.queryByRole('heading')).not.toBeInTheDocument();
     });
+
+    // Robbo: a failed save used to close the editor silently; now it stays open with what failed and the code.
+    test('failed save of an existing post keeps the editor open with an error notice', async () => {
+      const threadId = 'thread-1';
+      await setupData({ editReasons: [{ code: 'reason-1', label: 'Reason 1' }] });
+      await act(async () => {
+        axiosMock.onGet(`${threadsApiUrl}${threadId}/`).reply(200, Factory.build('thread'));
+        await executeThunk(fetchThread(threadId), store.dispatch, store.getState);
+        await renderComponent(true, `/${courseId}/posts/${threadId}/edit`);
+      });
+      axiosMock.onPatch(`${threadsApiUrl}${threadId}/`).reply(500);
+
+      await act(async () => {
+        fireEvent.change(screen.getByRole('combobox', { name: /reason for editing/i }), { target: { value: 'reason-1' } });
+      });
+      await act(async () => {
+        fireEvent.click(screen.getByRole('button', { name: /submit/i }));
+      });
+
+      await waitFor(() => expect(screen.getByText(/SRV-ERROR/)).toBeInTheDocument());
+      expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
+    });
   });
 
   describe('Edit codes', () => {

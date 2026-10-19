@@ -15,6 +15,7 @@ import { TinyMCEEditor } from '../../../../components';
 import FormikErrorFeedback from '../../../../components/FormikErrorFeedback';
 import PostPreviewPanel from '../../../../components/PostPreviewPanel';
 import useDispatchWithState from '../../../../data/hooks';
+import { RobboErrorNotice } from '../../../../robbo-errors';
 import DiscussionContext from '../../../common/context';
 import {
   selectModerationSettings,
@@ -48,6 +49,7 @@ const CommentEditor = ({
   const { editReasons } = useSelector(selectModerationSettings);
   const [submitting, dispatch] = useDispatchWithState();
   const [editorContent, setEditorContent] = useState();
+  const [submitError, setSubmitError] = useState(null);
   const { addDraftContent, getDraftContent, removeDraftContent } = useDraftContent();
 
   const canDisplayEditReason = (edit
@@ -71,6 +73,7 @@ const CommentEditor = ({
   };
 
   const handleCloseEditor = useCallback((resetForm) => {
+    setSubmitError(null);
     resetForm({ values: initialValues });
     onCloseEditor();
   }, [onCloseEditor, initialValues]);
@@ -85,14 +88,20 @@ const CommentEditor = ({
   }, [parentId, id, threadId, setDraftComments, setDraftResponses]);
 
   const saveUpdatedComment = useCallback(async (values, { resetForm }) => {
+    let failure;
     if (id) {
       const payload = {
         ...values,
         editReasonCode: values.editReasonCode || undefined,
       };
-      await dispatch(editComment(id, payload));
+      failure = await dispatch(editComment(id, payload));
     } else {
-      await dispatch(addComment(values.comment, threadId, parentId, enableInContextSidebar));
+      failure = await dispatch(addComment(values.comment, threadId, parentId, enableInContextSidebar));
+    }
+    // Robbo: a failed save keeps the editor and its text, with what failed and the code (src/robbo-errors).
+    if (failure) {
+      setSubmitError(failure);
+      return;
     }
     /* istanbul ignore if: TinyMCE is mocked so this cannot be easily tested */
     if (editorRef.current) {
@@ -202,6 +211,7 @@ const CommentEditor = ({
               </Form.Control.Feedback>
             )}
           <PostPreviewPanel htmlNode={values.comment} />
+          {submitError && <RobboErrorNotice info={submitError} className="mt-2 mb-0" />}
           <div className="d-flex py-2 justify-content-end">
             <Button
               variant="outline-primary"
