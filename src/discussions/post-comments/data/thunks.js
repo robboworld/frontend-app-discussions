@@ -1,6 +1,7 @@
 import { camelCaseObject } from '@edx/frontend-platform';
 import { logError } from '@edx/frontend-platform/logging';
 
+import { describeError } from '../../../robbo-errors';
 import { getHttpErrorStatus } from '../../utils';
 import {
   deleteComment, getCommentResponses, getThreadComments, postComment, updateComment,
@@ -130,6 +131,7 @@ export function editComment(commentId, comment) {
       dispatch(updateCommentRequest({ commentId }));
       const data = await updateComment(commentId, comment);
       dispatch(updateCommentSuccess(camelCaseObject(data)));
+      return null;
     } catch (error) {
       if (getHttpErrorStatus(error) === 403) {
         dispatch(updateCommentDenied());
@@ -137,6 +139,8 @@ export function editComment(commentId, comment) {
         dispatch(updateCommentFailed());
       }
       logError(error);
+      // Robbo: what failed, with the code and number (src/robbo-errors), for the editor's notice.
+      return describeError(error);
     }
   };
 }
@@ -151,6 +155,7 @@ export function addComment(comment, threadId, parentId = null, enableInContextSi
       }));
       const data = await postComment(comment, threadId, parentId, enableInContextSidebar);
       dispatch(postCommentSuccess(camelCaseObject(data)));
+      return null;
     } catch (error) {
       if (getHttpErrorStatus(error) === 403) {
         dispatch(postCommentDenied());
@@ -158,6 +163,8 @@ export function addComment(comment, threadId, parentId = null, enableInContextSi
         dispatch(postCommentFailed());
       }
       logError(error);
+      // Robbo: what failed, with the code and number (src/robbo-errors), for the editor's notice.
+      return describeError(error);
     }
   };
 }

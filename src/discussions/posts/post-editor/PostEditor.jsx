@@ -1,5 +1,5 @@
 import React, {
-  useCallback, useContext, useEffect, useRef,
+  useCallback, useContext, useEffect, useRef, useState,
 } from 'react';
 import PropTypes from 'prop-types';
 
@@ -21,6 +21,7 @@ import FormikErrorFeedback from '../../../components/FormikErrorFeedback';
 import PostHelpPanel from '../../../components/PostHelpPanel';
 import PostPreviewPanel from '../../../components/PostPreviewPanel';
 import useDispatchWithState from '../../../data/hooks';
+import { RobboErrorNotice } from '../../../robbo-errors';
 import selectCourseCohorts from '../../cohorts/data/selectors';
 import fetchCourseCohorts from '../../cohorts/data/thunks';
 import DiscussionContext from '../../common/context';
@@ -65,6 +66,7 @@ const PostEditor = ({
   const topicId = useCurrentDiscussionTopic();
   const commentsPagePath = useCommentsPagePath();
   const [submitting, dispatchSubmit] = useDispatchWithState();
+  const [submitError, setSubmitError] = useState(null);
   const enableInContext = useSelector(selectEnableInContext);
   const nonCoursewareTopics = useSelector(enableInContext ? inContextNonCourseware : selectNonCoursewareTopics);
   const nonCoursewareIds = useSelector(enableInContext ? inContextCoursewareIds : selectNonCoursewareIds);
@@ -117,6 +119,7 @@ const PostEditor = ({
   };
 
   const hideEditor = useCallback((resetForm) => {
+    setSubmitError(null);
     resetForm({ values: initialValues });
     if (editExisting) {
       const newLocation = discussionsPath(commentsPagePath, {
@@ -139,8 +142,9 @@ const PostEditor = ({
   );
 
   const submitForm = useCallback(async (values, { resetForm }) => {
+    let failure;
     if (editExisting) {
-      await dispatchSubmit(updateExistingThread(postId, {
+      failure = await dispatchSubmit(updateExistingThread(postId, {
         topicId: values.topic,
         type: values.postType,
         title: values.title,
@@ -150,7 +154,7 @@ const PostEditor = ({
     } else {
       const cohort = canSelectCohort(values.topic) ? selectedCohort(values.cohort) : undefined;
       // if not allowed to set cohort, always undefined, so no value is sent to backend
-      await dispatchSubmit(createNewThread({
+      failure = await dispatchSubmit(createNewThread({
         courseId,
         topicId: values.topic,
         type: values.postType,
@@ -162,6 +166,11 @@ const PostEditor = ({
         cohort,
         enableInContextSidebar,
       }));
+    }
+    // Robbo: a failed save keeps the editor and its text, with what failed and the code (src/robbo-errors).
+    if (failure) {
+      setSubmitError(failure);
+      return;
     }
     /* istanbul ignore if: TinyMCE is mocked so this cannot be easily tested */
     if (editorRef.current) {
@@ -447,6 +456,7 @@ const PostEditor = ({
           </>
           )}
         </div>
+        {submitError && <RobboErrorNotice info={submitError} className="mb-3" />}
         <div className="d-flex justify-content-end">
           <Button
             variant="outline-primary"

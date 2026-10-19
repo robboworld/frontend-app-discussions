@@ -4,6 +4,7 @@ import { logError } from '@edx/frontend-platform/logging';
 import {
   PostsStatusFilter, ThreadType,
 } from '../../../data/constants';
+import { describeError } from '../../../robbo-errors';
 import { getHttpErrorStatus } from '../../utils';
 import {
   deleteThread, getThread, getThreads, postThread, updateThread,
@@ -225,6 +226,7 @@ export function createNewThread({
         anonymousToPeers,
       }, enableInContextSidebar);
       dispatch(postThreadSuccess(camelCaseObject(data)));
+      return null;
     } catch (error) {
       if (getHttpErrorStatus(error) === 403) {
         dispatch(postThreadDenied());
@@ -232,6 +234,8 @@ export function createNewThread({
         dispatch(postThreadFailed());
       }
       logError(error);
+      // Robbo: what failed, with the code and number (src/robbo-errors), for the editor's notice.
+      return describeError(error);
     }
   };
 }
@@ -271,6 +275,7 @@ export function updateExistingThread(threadId, {
         closeReasonCode,
       });
       dispatch(updateThreadSuccess(camelCaseObject(data)));
+      return null;
     } catch (error) {
       if (getHttpErrorStatus(error) === 403) {
         dispatch(updateThreadDenied());
@@ -278,6 +283,8 @@ export function updateExistingThread(threadId, {
         dispatch(updateThreadFailed());
       }
       logError(error);
+      // Robbo: what failed, with the code and number (src/robbo-errors), for the editor's notice.
+      return describeError(error);
     }
   };
 }

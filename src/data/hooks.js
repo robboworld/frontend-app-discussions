@@ -12,7 +12,9 @@ import { useDispatch } from 'react-redux';
  * If you need to track multiple requests, or multiple types of requests, use multiple
  * instances of this hook. e.g. one for loading and one for saving.
  *
- * @return {(boolean|(function(*=): Promise<void>)|*)[]}
+ * The function returns what the thunk returns (Robbo: the editors get a failed save from it).
+ *
+ * @return {(boolean|(function(*=): Promise<*>)|*)[]}
  */
 export default function useDispatchWithState() {
   const dispatch = useDispatch();
@@ -20,8 +22,9 @@ export default function useDispatchWithState() {
 
   const dispatchWithState = async (thunk) => {
     setDispatching(true);
-    await dispatch(thunk);
+    const result = await dispatch(thunk);
     setDispatching(false);
+    return result;
   };
 
   return [
