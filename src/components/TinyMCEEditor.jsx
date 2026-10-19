@@ -12,6 +12,7 @@ import { useIntl } from '@edx/frontend-platform/i18n';
 import { MAX_UPLOAD_FILE_SIZE } from '../data/constants';
 import messages from '../discussions/messages';
 import { uploadFile } from '../discussions/posts/data/api';
+import { describeCode, describeError, inlineText } from '../robbo-errors';
 
 import 'tinymce/plugins/code';
 // Theme
@@ -72,7 +73,9 @@ const TinyMCEEditor = (props) => {
       const blob = blobInfo.blob();
       const imageSize = blobInfo.blob().size / 1024;
       if (imageSize > MAX_UPLOAD_FILE_SIZE) {
-        failure(`Images size should not exceed ${MAX_UPLOAD_FILE_SIZE} KB`);
+        // Robbo: the catalog's text in the user's language (src/robbo-errors), not English in KB.
+        const info = describeCode('UPLOAD-SIZE', { params: { limit: MAX_UPLOAD_FILE_SIZE / 1024 } });
+        failure(inlineText(info));
         return;
       }
       const filename = blobInfo.filename();
@@ -84,7 +87,8 @@ const TinyMCEEditor = (props) => {
       img.src = location;
       success(location);
     } catch (e) {
-      failure(e.toString(), { remove: true });
+      // Robbo: the human text with the code and number (src/robbo-errors), not "AxiosError: …".
+      failure(inlineText(describeError(e)), { remove: true });
     }
   }, [courseId, postId]);
 
