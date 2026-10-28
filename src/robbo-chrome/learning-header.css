@@ -309,3 +309,15 @@
     display: none;
   }
 }
+
+/* «Что нового» for learners: dot on the user menu button, item above «Выйти» (userMenuWhatsNew.js);
+   `.robbo-wn-dot` / `.robbo-wn-count` come from the LMS widget. */
+.learning-header .user-dropdown > .btn {
+  position: relative;
+}
+
+.learning-header .dropdown-menu .robbo-header-whats-new-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}

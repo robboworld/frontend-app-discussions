@@ -5,6 +5,7 @@
  * Part of the Robbo Open edX MFE overrides. See NOTICE at repository root.
  */
 import React, { useEffect, useRef } from 'react';
+import PropTypes from 'prop-types';
 
 import { getConfig } from '@edx/frontend-platform';
 import { getLocale } from '@edx/frontend-platform/i18n';
@@ -35,12 +36,15 @@ const loadWidget = (lmsBaseUrl) => {
   return widgetPromise;
 };
 
-const RobboWhatsNew = () => {
+const RobboWhatsNew = ({ profileToggle, onChange }) => {
   const containerRef = useRef(null);
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
 
   useEffect(() => {
     const lmsBaseUrl = getConfig().LMS_BASE_URL;
     let widget = null;
+    let unsubscribe = null;
     let cancelled = false;
     if (!lmsBaseUrl) {
       return undefined;
@@ -48,19 +52,42 @@ const RobboWhatsNew = () => {
     loadWidget(lmsBaseUrl)
       .then((api) => {
         if (!cancelled && containerRef.current) {
-          widget = api.mount(containerRef.current, { lmsUrl: lmsBaseUrl, lang: getLocale(), variant: 'on-dark' });
+          // Learners: no button here — «Что нового» is a user menu item (userMenuWhatsNew.js).
+          widget = api.mount(containerRef.current, {
+            lmsUrl: lmsBaseUrl, lang: getLocale(), variant: 'on-dark', profileToggle,
+          });
+          if (widget && widget.subscribe) {
+            unsubscribe = widget.subscribe((info) => {
+              if (onChangeRef.current) {
+                onChangeRef.current({ ...info, open: widget.open, pageUrl: `${lmsBaseUrl.replace(/\/$/, '')}/whats-new` });
+              }
+            });
+          }
         }
       })
       .catch(() => {});
     return () => {
       cancelled = true;
+      if (unsubscribe) {
+        unsubscribe();
+      }
       if (widget) {
         widget.unmount();
       }
     };
-  }, []);
+  }, [profileToggle]);
 
   return <span ref={containerRef} />;
+};
+
+RobboWhatsNew.propTypes = {
+  profileToggle: PropTypes.func,
+  onChange: PropTypes.func,
+};
+
+RobboWhatsNew.defaultProps = {
+  profileToggle: undefined,
+  onChange: undefined,
 };
 
 export default RobboWhatsNew;

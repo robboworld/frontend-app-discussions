@@ -13,6 +13,11 @@ const messages = defineMessages({
     defaultMessage: 'Studio',
     description: 'Header pill that opens Studio (platform staff only)',
   },
+  whatsNew: {
+    id: 'robbo.header.user.whatsNew',
+    defaultMessage: "What's new",
+    description: 'User menu item that opens the latest platform changes (learners)',
+  },
   studioAria: {
     id: 'robbo.header.studio.aria',
     defaultMessage: 'Go to Studio',
