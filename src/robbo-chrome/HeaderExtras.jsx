@@ -4,7 +4,7 @@
  *
  * Part of the Robbo Open edX MFE overrides. See NOTICE at repository root.
  */
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
 import { createPortal } from 'react-dom';
 
@@ -14,6 +14,7 @@ import { useIntl } from '@edx/frontend-platform/i18n';
 
 import { useRobboHeaderSlot } from './headerSlot';
 import messages from './messages';
+import { findUserMenuToggle, useUserMenuWhatsNew } from './userMenuWhatsNew';
 import RobboWhatsNew from './whatsNew';
 
 const getStudioUrl = (config) => {
@@ -21,11 +22,15 @@ const getStudioUrl = (config) => {
   return base ? String(base).replace(/\/$/, '') : '';
 };
 
-// Before the user menu, as in RobboHeader of the other MFEs: «Что нового» and, for platform staff,
-// the «Студия» pill. Styles: learning-header.css.
+// Before the user menu, as in RobboHeader of the other MFEs: «Что нового» (learners get it in the user
+// menu instead) and, for platform staff, the «Студия» pill. Styles: learning-header.css.
 const RobboHeaderExtras = ({ shellRef }) => {
   const intl = useIntl();
   const slot = useRobboHeaderSlot(shellRef);
+  // Learners: «Что нового» is an item of the user menu with a dot on its button (state from the widget).
+  const [whatsNew, setWhatsNew] = useState(null);
+  const profileToggle = useCallback(() => findUserMenuToggle(shellRef.current), [shellRef]);
+  useUserMenuWhatsNew(shellRef, whatsNew, intl.formatMessage(messages.whatsNew));
   if (!slot) {
     return null;
   }
@@ -34,7 +39,7 @@ const RobboHeaderExtras = ({ shellRef }) => {
   const showStudioLink = Boolean(studioUrl && getAuthenticatedUser()?.administrator);
   return createPortal(
     <>
-      <RobboWhatsNew />
+      <RobboWhatsNew profileToggle={profileToggle} onChange={setWhatsNew} />
       {showStudioLink && (
         <a
           className="robbo-header-studio-link__btn"
