@@ -4,19 +4,19 @@
  *
  * Part of the Robbo Open edX MFE overrides. See NOTICE at repository root.
  */
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-
 import { getConfig } from '@edx/frontend-platform';
 import { getLocale } from '@edx/frontend-platform/i18n';
 
 // «Что нового» button: one widget for every header, served by the LMS (robbo_changelog); it fetches
-// the user's changes on the LMS session and hides itself for guests and API errors.
+// the user's changes on the LMS session and hides itself for guests. For learners it reports
+// {inMenu, unread, label, open} through onChange instead: RobboHeader shows a profile menu item.
 const WIDGET_PATH = '/api/robbo/v1/whats-new/widget.js';
 
 let widgetPromise = null;
 
-const loadWidget = (lmsBaseUrl) => {
+export const loadWhatsNewWidget = (lmsBaseUrl) => {
   if (window.RobboWhatsNew) {
     return Promise.resolve(window.RobboWhatsNew);
   }
@@ -36,12 +36,12 @@ const loadWidget = (lmsBaseUrl) => {
   return widgetPromise;
 };
 
-const RobboWhatsNew = ({ profileToggle, onChange }) => {
-  const containerRef = useRef(null);
-  const onChangeRef = useRef(onChange);
+const RobboWhatsNew = ({ className, profileToggleRef, onChange }) => {
+  const containerRef = React.useRef(null);
+  const onChangeRef = React.useRef(onChange);
   onChangeRef.current = onChange;
 
-  useEffect(() => {
+  React.useEffect(() => {
     const lmsBaseUrl = getConfig().LMS_BASE_URL;
     let widget = null;
     let unsubscribe = null;
@@ -49,17 +49,20 @@ const RobboWhatsNew = ({ profileToggle, onChange }) => {
     if (!lmsBaseUrl) {
       return undefined;
     }
-    loadWidget(lmsBaseUrl)
+    loadWhatsNewWidget(lmsBaseUrl)
       .then((api) => {
         if (!cancelled && containerRef.current) {
-          // Learners: no button here — «Что нового» is a user menu item (userMenuWhatsNew.js).
           widget = api.mount(containerRef.current, {
-            lmsUrl: lmsBaseUrl, lang: getLocale(), variant: 'on-dark', profileToggle,
+            lmsUrl: lmsBaseUrl,
+            lang: getLocale(),
+            variant: 'on-dark',
+            // Learners: no button here — «Что нового» is a profile menu item, the panel hangs from the menu button.
+            profileToggle: profileToggleRef ? () => profileToggleRef.current : undefined,
           });
           if (widget && widget.subscribe) {
             unsubscribe = widget.subscribe((info) => {
               if (onChangeRef.current) {
-                onChangeRef.current({ ...info, open: widget.open, pageUrl: `${lmsBaseUrl.replace(/\/$/, '')}/whats-new` });
+                onChangeRef.current({ ...info, open: widget.open });
               }
             });
           }
@@ -75,18 +78,20 @@ const RobboWhatsNew = ({ profileToggle, onChange }) => {
         widget.unmount();
       }
     };
-  }, [profileToggle]);
+  }, [profileToggleRef]);
 
-  return <span ref={containerRef} />;
+  return <span ref={containerRef} className={className} />;
 };
 
 RobboWhatsNew.propTypes = {
-  profileToggle: PropTypes.func,
+  className: PropTypes.string,
+  profileToggleRef: PropTypes.shape({ current: PropTypes.instanceOf(Element) }),
   onChange: PropTypes.func,
 };
 
 RobboWhatsNew.defaultProps = {
-  profileToggle: undefined,
+  className: undefined,
+  profileToggleRef: undefined,
   onChange: undefined,
 };
 

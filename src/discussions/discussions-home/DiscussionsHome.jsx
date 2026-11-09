@@ -8,12 +8,6 @@ import {
   matchPath, Route, Routes, useLocation, useMatch,
 } from 'react-router-dom';
 
-import { LearningHeader as Header } from '@edx/frontend-component-header';
-import { getAuthenticatedUser } from '@edx/frontend-platform/auth';
-
-import '../../robbo-chrome/learning-header.css';
-import RobboHeaderExtras from '../../robbo-chrome/HeaderExtras';
-import { ROBBO_STACK_PROFILE } from '../../robbo-chrome/stackProfile';
 import { Spinner } from '../../components';
 import selectCourseTabs from '../../components/NavigationBar/data/selectors';
 import { ALL_ROUTES, DiscussionProvider, Routes as ROUTES } from '../../data/constants';
@@ -31,7 +25,9 @@ import { selectPostEditorVisible } from '../posts/data/selectors';
 import { isCourseStatusValid } from '../utils';
 import useFeedbackWrapper from './FeedbackWrapper';
 
-const FooterSlot = lazy(() => import('@edx/frontend-component-footer').then(module => ({ default: module.FooterSlot })));
+// Robbo: the site header and footer of the Learning course pages (src/robbo-layout, as in profile).
+const RobboHeader = lazy(() => import('../../robbo-layout').then(module => ({ default: module.RobboHeader })));
+const RobboFooter = lazy(() => import('../../robbo-layout').then(module => ({ default: module.RobboFooter })));
 const PostActionsBar = lazy(() => import('../posts/post-actions-bar/PostActionsBar'));
 const CourseTabsNavigation = lazy(() => import('../../components/NavigationBar/CourseTabsNavigation'));
 const LegacyBreadcrumbMenu = lazy(() => import('../navigation/breadcrumb-menu/LegacyBreadcrumbMenu'));
@@ -47,9 +43,7 @@ const DiscussionsHome = () => {
   const postEditorVisible = useSelector(selectPostEditorVisible);
   const provider = useSelector(selectDiscussionProvider);
   const enableInContext = useSelector(selectEnableInContext);
-  const {
-    courseNumber, courseTitle, org, courseStatus, isEnrolled,
-  } = useSelector(selectCourseTabs);
+  const { courseStatus, isEnrolled } = useSelector(selectCourseTabs);
   const isUserLearner = useSelector(selectIsUserLearner);
   const pageParams = useMatch(ROUTES.COMMENTS.PAGE)?.params;
   const page = pageParams?.page || null;
@@ -58,8 +52,6 @@ const DiscussionsHome = () => {
   const isOnTabletorDesktop = useIsOnTablet();
   let displaySidebar = useSidebarVisible();
   const enableInContextSidebar = Boolean(new URLSearchParams(location.search).get('inContextSidebar') !== null);
-  // Robbo buttons before the user menu of the package header (robbo-chrome/HeaderExtras.jsx).
-  const stackShellRef = useRef(null);
   const {
     courseId, postId, topicId, category, learnerUsername,
   } = params;
@@ -87,18 +79,7 @@ const DiscussionsHome = () => {
   return (
     <Suspense fallback={(<Spinner />)}>
       <DiscussionContext.Provider value={discussionContextValue}>
-        {!enableInContextSidebar && (
-          // Admin-only stack profile letter (O / S / C) left of the logo — drawn in learning-header.css.
-          <div
-            ref={stackShellRef}
-            className={classNames('robbo-stack-shell', `robbo-stack-shell--${ROBBO_STACK_PROFILE}`, {
-              'robbo-stack-shell--admin': getAuthenticatedUser()?.administrator,
-            })}
-          >
-            <Header courseOrg={org} courseNumber={courseNumber} courseTitle={courseTitle} />
-            <RobboHeaderExtras shellRef={stackShellRef} />
-          </div>
-        )}
+        {!enableInContextSidebar && <RobboHeader collapseNavIntoUserMenuOnNarrow />}
         <main className="container-fluid d-flex flex-column p-0 w-100 font-size" id="main" tabIndex="-1">
           {!enableInContextSidebar && <CourseTabsNavigation />}
           {(isEnrolled || !isUserLearner) && (
@@ -192,7 +173,7 @@ const DiscussionsHome = () => {
           )}
           {!enableInContextSidebar && isEnrolled && (<DiscussionsProductTour />)}
         </main>
-        {!enableInContextSidebar && <FooterSlot />}
+        {!enableInContextSidebar && <RobboFooter />}
       </DiscussionContext.Provider>
     </Suspense>
   );

@@ -2,6 +2,7 @@
 @import "~@edx/brand/paragon/variables.scss";
 @import "~@openedx/paragon/scss/core/core.scss";
 @import "~@edx/brand/paragon/overrides.scss";
+@import "../../sass/robbo-brand-tokens";
 
 $fa-font-path: "~font-awesome/fonts";
 @import "~font-awesome/scss/font-awesome";
@@ -44,5 +45,19 @@ $fa-font-path: "~font-awesome/fonts";
       color: $primary-500;
       border-bottom-color: $primary-500;
     }
+  }
+}
+
+// Robbo: the tab colours of the Learning course pages (frontend-app-learning/src/index.scss).
+.course-tabs-navigation .nav-underline-tabs .nav-link {
+  &:hover,
+  &:focus {
+    color: $robbo-brand-primary;
+    border-bottom-color: $robbo-brand-primary;
+  }
+
+  &.active {
+    color: $robbo-brand-primary-dark;
+    border-bottom-color: $robbo-brand-primary-dark;
   }
 }
