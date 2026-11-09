@@ -280,7 +280,8 @@ header {
   outline: none;
 }
 
-header {
+// Robbo: only the package LearningHeader (the Robbo header from src/robbo-layout has its own styles).
+.learning-header {
   line-height: 28px;
   font-size: 18px !important;
 

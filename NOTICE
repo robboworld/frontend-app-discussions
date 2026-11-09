@@ -4,7 +4,7 @@ Robbo Open edX — frontend-app-discussions override
 This repository is a Robbo fork/override of Open edX frontend-app-discussions.
 Upstream: https://github.com/openedx/frontend-app-discussions .
 
-Modifications and Robbo-specific files (including src/robbo-chrome/
+Modifications and Robbo-specific files (including src/robbo-layout/
 and files marked in copyright headers) are:
 
   Copyright (C) 2026 Robbo <https://robbo.ru>
